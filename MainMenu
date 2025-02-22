@@ -1,0 +1,75 @@
+package com.example.bandana.ui
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SidebarMenuScreen() {
+    var menuExpanded by remember { mutableStateOf(false) }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("UE BANDANA", color = Color.White) },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Red)
+            )
+        },
+        content = { paddingValues ->
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
+                if (menuExpanded) {
+                    SidebarMenu { menuExpanded = false }
+                }
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Button(onClick = { menuExpanded = !menuExpanded }) {
+                        Text("Toggle Menu")
+                    }
+                }
+            }
+        }
+    )
+}
+
+@Composable
+fun SidebarMenu(onClose: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .width(200.dp)
+            .fillMaxHeight()
+            .background(Color.LightGray)
+            .padding(10.dp)
+    ) {
+        val menuItems = listOf(
+            "User Reports", "Guidance Counsellors",
+            "Freedom Wall", "Diary", "Mental Health Tips",
+            "Notifications", "Sign Out"
+        )
+
+        menuItems.forEach { title ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp)
+                    .clickable { onClose() },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(title, fontSize = 16.sp, color = Color.Black)
+            }
+        }
+    }
+}
