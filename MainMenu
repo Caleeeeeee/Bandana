@@ -1,4 +1,4 @@
-MainMenupackage com.example.bandana.ui
+package com.example.bandana.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SidebarMenuScreen(role: String, onSignOut: () -> Unit) {
+fun SidebarMenuScreen() {
     var menuExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -30,7 +30,7 @@ fun SidebarMenuScreen(role: String, onSignOut: () -> Unit) {
                     .padding(paddingValues)
             ) {
                 if (menuExpanded) {
-                    SidebarMenu(role, onClose = { menuExpanded = false }, onSignOut = onSignOut)
+                    SidebarMenu { menuExpanded = false }
                 }
                 Column(
                     modifier = Modifier.fillMaxSize(),
@@ -46,37 +46,26 @@ fun SidebarMenuScreen(role: String, onSignOut: () -> Unit) {
 }
 
 @Composable
-fun SidebarMenu(role: String, onClose: () -> Unit, onSignOut: () -> Unit) {
-    val adminMenuItems = listOf(
-       "User Reports", "Guidance Counsellors",
-       "Freedom Wall", "Diary", "Mental Health Tips",
-       "Notifications", "Sign Out"
-    )
-
-    val userMenuItems = listOf(
-        "User Reports", "Guidance Counsellors",
-        "Freedom Wall", "Diary", "Mental Health Tips",
-        "Notifications", "Sign Out"
-    )
-
-    val menuItems = if (role == "admin") adminMenuItems else userMenuItems
-
+fun SidebarMenu(onClose: () -> Unit) {
     Column(
         modifier = Modifier
-            .width(220.dp)
+            .width(200.dp)
             .fillMaxHeight()
             .background(Color.LightGray)
             .padding(10.dp)
     ) {
+        val menuItems = listOf(
+            "User Reports", "Guidance Counsellors",
+            "Freedom Wall", "Diary", "Mental Health Tips",
+            "Notifications", "Sign Out"
+        )
+
         menuItems.forEach { title ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(10.dp)
-                    .clickable {
-                        if (title == "Sign Out") onSignOut()
-                        onClose()
-                    },
+                    .clickable { onClose() },
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(title, fontSize = 16.sp, color = Color.Black)
