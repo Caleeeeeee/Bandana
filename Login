@@ -1,5 +1,6 @@
 package com.example.bandana.ui
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -9,13 +10,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.bandana.ui.theme.BandanaTheme
+import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun LoginScreen(onLoginSuccess: () -> Unit) {
-    var username by remember { mutableStateOf("") }
+fun LoginScreen(navController: NavController) {
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
+    val auth = FirebaseAuth.getInstance()
 
     Column(
         modifier = Modifier
@@ -27,9 +30,9 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
-            value = username,
-            onValueChange = { username = it },
-            label = { Text("Username") }
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email") }
         )
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -42,10 +45,8 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
         Spacer(modifier = Modifier.height(10.dp))
 
         Button(onClick = {
-            if (username == "admin" && password == "password") {
-                onLoginSuccess() // Navigate to Main Menu
-            } else {
-                errorMessage = "Invalid Credentials"
+            loginWithEmail(auth, email, password, navController) { error ->
+                errorMessage = error
             }
         }) {
             Text("Login")
@@ -55,5 +56,29 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
             Spacer(modifier = Modifier.height(10.dp))
             Text(text = errorMessage, color = Color.Red)
         }
+    }
+}
+
+fun loginWithEmail(
+    auth: FirebaseAuth,
+    email: String,
+    password: String,
+    navController: NavController,
+    onError: (String) -> Unit
+) {
+    if (email.isNotEmpty() && password.isNotEmpty()) {
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnSuccessListener { result ->
+                val user = result.user
+                user?.let {
+                    checkUserRole(it.uid, navController)
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("LoginError", "Error: ${exception.message}")
+                onError("Invalid email or password")
+            }
+    } else {
+        onError("Field cannot be empty")
     }
 }
